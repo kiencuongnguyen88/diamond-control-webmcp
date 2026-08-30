@@ -1,4 +1,0 @@
-{
-  "compilerOptions":{"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","strict":true,"skipLibCheck":true,"lib":["ES2022","DOM","DOM.Iterable"],"outDir":"dist-test/src","rootDir":"src","sourceMap":false},
-  "include":["src/domain.ts","src/fixtures.ts","src/types.ts","src/webmcp.ts"]
-}
