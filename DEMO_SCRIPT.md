@@ -1,33 +1,30 @@
-# Demo Script — target: under 3 minutes
+# Demo Script — 5-minute judge proof
 
-## 0:00–0:25 — Problem
+## 0:00–0:35 — Problem
+An agent can make a correct plan from state N and become wrong one second later when another actor changes the state. The dangerous part is not the error message; it is mutating after the plan's preconditions have expired.
 
-Show Diamond Control and explain the problem: agents can help triage work, but giving an agent the ability to recommend an action should not silently give it decision authority.
+## 0:35–1:20 — Bind intent to reality
+Ask the agent to read attention items and recommend a next move. Show the returned lane, state, and `observed_revision`.
 
-## 0:25–0:50 — WebMCP contract
+## 1:20–2:10 — Break it deliberately
+Before preparation, use the visible **Simulate external update** control. The lane revision changes, but the prior recommendation remains bound to the old revision. Ask the agent to prepare using the old revision.
 
-Open Site tools and show the five explicit WebMCP tools:
+Expected result:
+- `BLOCKED_SAFE`
+- `STALE_STATE`
+- expected vs observed revision visible
+- `action_state_changed:false`
+- no proposal created/replaced
+- explicit next valid move
 
-`get_workspace_state`, `get_attention_items`, `recommend_next_move`, `prepare_action`, `request_human_gate`.
+## 2:10–3:10 — Recover
+Fresh-read and run `recommend_next_move` again. It returns the new revision and updated next move. Prepare from that revision; preparation succeeds.
 
-Point out that the first three are read/advisory tools and the last two only prepare state for Human review.
+## 3:10–4:00 — Human authority
+Request Human Gate. Attempt a conflicting preparation while the gate is open. Show `BLOCKED_SAFE / HUMAN_GATE_OCCUPIED`; the original proposal remains intact. Human resolves the gate in the visible UI.
 
-## 0:50–1:45 — Natural-language agent flow
+## 4:00–4:40 — Proof
+Show automated tests and explain the invariant: diagnostic failure state may be recorded, but authoritative action state is byte-equivalent before/after a blocked prepare in tests.
 
-Ask:
-
-> What needs my attention? Recommend one next move, prepare it for my review, and request my approval. Do not approve or reject anything for me.
-
-Show the agent select the synthetic `proof-repair` lane, prepare the bounded next move, and request the Human Gate.
-
-## 1:45–2:20 — Human authority
-
-Show `AWAITING_HUMAN`.
-
-Explain that no WebMCP tool can approve or reject. Click one visible Human decision button and show the receipt.
-
-Mention that once an action is awaiting Human review, another agent preparation cannot replace it.
-
-## 2:20–2:45 — Close
-
-Summarize the WebMCP value: explicit structured tools make the agent workflow reliable, while the visible Human Gate keeps consequential authority with the person using the page.
+## 4:40–5:00 — Engineering judgment
+Five tools retained. No backend, no hidden execution, no automatic approval, no generic reliability platform. The event work is the state-precondition + safe-stop + recovery loop, not the August baseline.
